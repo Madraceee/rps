@@ -9,12 +9,13 @@ const CreateGame = () => {
     const [stake, setStake] = useState<string>("");
     const [salt, setSalt] = useState<string>("0")
     const [move, setMove] = useState<Move>(Move.Null);
+    const [contractAddress, setContractAddress] = useState<string>("")
     const { createGame } = useContract();
 
     const startGame = async () => {
         const convertedSalt = parseInt(salt)
         const address = await createGame(opponentAddress, move, convertedSalt, stake)
-        console.log(address)
+        setContractAddress(address)
     }
 
     return (
@@ -28,6 +29,7 @@ const CreateGame = () => {
             <MoveBtn text="Spock" onClick={() => setMove(Move.Spock)} />
             <MoveBtn text="Lizard" onClick={() => setMove(Move.Lizard)} />
             <button onClick={startGame}>Create Game</button>
+            {contractAddress !== "" ? <p>Contract Address : {contractAddress}</p> : null}
         </div>
     );
 }
