@@ -116,7 +116,7 @@ const PlayGame = () => {
                 <Button onClick={getInfo}>Open Game</Button>
             </div>
             {showContract || loading ? <Separator /> : null}
-            {loading ? <Loader /> : null}
+            {loading ? <div className="w-full flex flex-row justify-center align-middle my-5"><Loader /></div> : null}
             {showContract ?
                 address !== j1 && address !== j2 ?
                     <p>You cannot play this match</p> :

@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Loader2 } from "lucide-react";
 import CopyToClipBoard from "./CopyToClipboard";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const CreateGame = () => {
     const [opponentAddress, setOpponentAddress] = useState<string>("");
@@ -16,6 +17,7 @@ const CreateGame = () => {
     const [move, setMove] = useState<Move>(Move.Null);
     const [contractAddress, setContractAddress] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
+    const [valueType, setValueType] = useState<string>("ether")
     const { createGame, isValidAddress } = useContract();
     const { toast } = useToast();
 
@@ -50,7 +52,7 @@ const CreateGame = () => {
 
         try {
             setLoading(true);
-            const address = await createGame(opponentAddress, move, convertedSalt, stake);
+            const address = await createGame(opponentAddress, move, convertedSalt, stake, valueType);
             setContractAddress(address);
             setLoading(false);
 
@@ -96,10 +98,22 @@ const CreateGame = () => {
                 <p><span className="font-bold ">Note:</span> Remember your salt and move</p>
             </div>
             <Input value={opponentAddress} onChange={(e) => setOpponentAddress(e.target.value)} placeholder="Opp. Address" />
-            <Input value={stake} onChange={(e) => setStake(e.target.value)} placeholder="Stake in gwei" />
             <div className="flex flex-row gap-2">
-                <Input value={salt} onChange={(e) => setSalt(e.target.value)} placeholder="Salt" />
-                <Button onClick={generateSalt}>Generate Random Salt</Button>
+                <Input value={stake} onChange={(e) => setStake(e.target.value)} placeholder="Stake" className="w-1/2 lg:w-3/4" />
+                <Select onValueChange={(e) => setValueType(e)}>
+                    <SelectTrigger className="w-1/2 lg:w-1/4">
+                        <SelectValue placeholder="Ether" />
+                    </SelectTrigger>
+                    <SelectContent >
+                        <SelectItem value="ether">Ether</SelectItem>
+                        <SelectItem value="gwei">Gwei</SelectItem>
+                        <SelectItem value="wei">Wei</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="flex flex-row gap-2">
+                <Input value={salt} onChange={(e) => setSalt(e.target.value)} placeholder="Salt" className="w-1/2 lg:w-3/4" />
+                <Button onClick={generateSalt} className="w-1/2 lg:w-1/4">Generate Salt</Button>
             </div>
 
             <p className="font-bold mt-2">Select Move</p>
