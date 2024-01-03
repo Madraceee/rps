@@ -1,8 +1,8 @@
 'use client'
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MoveBtn from "./MoveBtn"
 import { Move, useContract } from "@/hooks/contract";
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Loader from "./Loader";
@@ -12,21 +12,25 @@ import { Separator } from "./ui/separator";
 import { toast } from "./ui/use-toast";
 import { Loader2 } from "lucide-react";
 import CopyToClipBoard from "./CopyToClipboard";
+import { shortenTxHash } from "@/lib/utils";
 
 const PlayGame = () => {
 
     const [contractAddress, setContractAddress] = useState<string>("");
     const [showContract, setShowContract] = useState<boolean>(false);
-    const [stake, setStake] = useState<BigNumber>();
+    const [stake, setStake] = useState<BigNumber>(BigNumber.from(0));
     const [j1, setJ1] = useState<string>("");
     const [j2, setJ2] = useState<string>("");
     const [move, setMove] = useState<Move>(Move.Null);
+    const [isTimeout, setIsTimeout] = useState<boolean>(false);
     const [salt, setSalt] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [txLoading, setTxLoading] = useState<boolean>(false);
-    const [tx, setTx] = useState<string>("")
+    const [tx, setTx] = useState<string>("");
+    const [hasC2Played, setHasC2Played] = useState<boolean>(false)
+    const [timeoutLoading, setTimeoutLoading] = useState<boolean>(false);
 
-    const { play, getContractInfo, solve, isValidAddress } = useContract();
+    const { play, getContractInfo, solve, isValidAddress, c1Timeout, c2Timeout } = useContract();
     const address = useSelector((state: RootState) => state.wallet.address);
 
     const playMove = async () => {
@@ -88,8 +92,25 @@ const PlayGame = () => {
         setTxLoading(false)
     }
 
+    const getStakeBack = async () => {
+        setTimeoutLoading(true);
+        try {
+            if (address === j1) {
+                await c1Timeout(contractAddress);
+            } else if (address === j2) {
+                await c2Timeout(contractAddress);
+            }
+        } catch (error) {
+            toast({
+                description: "Timeout execution failed",
+                variant: "destructive"
+            });
+        }
+        setTimeoutLoading(false);
+    }
 
     async function getInfo() {
+        setShowContract(false);
         if (!isValidAddress(contractAddress)) {
             toast({
                 title: "Wrong Value",
@@ -99,14 +120,16 @@ const PlayGame = () => {
             setContractAddress("")
             return;
         }
-        setLoading(true)
+        setLoading(true);
         const contractInfo = await getContractInfo(contractAddress);
-        setStake(contractInfo.stake)
-        setJ1(contractInfo.j1)
-        setJ2(contractInfo.j2)
+        setStake(contractInfo.stake);
+        setJ1(contractInfo.j1);
+        setJ2(contractInfo.j2);
+        setIsTimeout(contractInfo.isTimeout);
+        setHasC2Played(contractInfo.hasC2Played);
 
-        setLoading(false)
-        setShowContract(true)
+        setLoading(false);
+        setShowContract(true);
     }
 
     return (
@@ -122,9 +145,11 @@ const PlayGame = () => {
                     <p>You cannot play this match</p> :
                     <>
                         <div className="font-light">
-                            <p><span className="font-bold">Stake :</span> {stake?.toString()}</p>
+                            <p><span className="font-bold">Stake :</span> {ethers.utils.formatUnits(stake, "gwei")} gwei</p>
                             <p><span className="font-bold">Player 1 :</span> {j1}</p>
                             <p><span className="font-bold">Player 2 :</span> {j2}</p>
+                            <p><span className="font-bold">Timeout:</span> {isTimeout === true ? "True" : "False"}</p>
+                            <p><span className="font-bold">Has Player 2 Played:</span> {hasC2Played === true ? "True" : "False"}</p>
                         </div>
 
                         {stake?.toString() === "0" ?
@@ -134,7 +159,9 @@ const PlayGame = () => {
                                 <>
                                     {
                                         address === j2 ?
-                                            <p className="text-left">This is player 2's turn</p> : <p>Player 1, confirm your move</p>
+                                            <p className="text-left">This is player 2's turn</p>
+                                            :
+                                            <p>Player 1, confirm your move</p>
                                     }
                                     <p className="font-bold mt-2">Select Move</p>
                                     <div className="flex flex-wrap flex-row gap-2 w-full justify-between" >
@@ -144,6 +171,17 @@ const PlayGame = () => {
                                         <MoveBtn text="Spock" onClick={() => setMove(Move.Spock)} isSelected={move === 4} />
                                         <MoveBtn text="Lizard" onClick={() => setMove(Move.Lizard)} isSelected={move === 5} />
                                     </div>
+                                    {isTimeout ?
+                                        <Button onClick={getStakeBack} className="w-fit mx-auto" disabled={timeoutLoading}>
+                                            {timeoutLoading ?
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Loading
+                                                </> :
+                                                <>Get Stake Back</>
+                                            }
+                                        </Button>
+                                        : null}
                                     {
                                         address === j2 &&
                                         <>
@@ -174,16 +212,14 @@ const PlayGame = () => {
                                             </Button>
                                         </>
                                     }
-                                    { }
+                                    {tx !== "" ?
+                                        <p className="text-center w-full">
+                                            Transaction : <span className="font-bold">{shortenTxHash(tx)} <CopyToClipBoard content={tx} /></span>
+                                        </p> : null
+                                    }
                                 </>
                             )
                         }
-                        {tx !== "" ?
-                            <p className="text-center">
-                                Transaction : <span className="font-bold">{tx} <CopyToClipBoard content={tx} /></span>
-                            </p> : null
-                        }
-
                     </> : null
             }
         </div>
