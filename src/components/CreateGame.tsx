@@ -3,6 +3,7 @@ import { useState } from "react";
 import MoveBtn from "./MoveBtn";
 import { BigNumber } from "ethers";
 import { Move, useContract } from "@/hooks/contract";
+import { useToast } from "./ui/use-toast";
 
 const CreateGame = () => {
     const [opponentAddress, setOpponentAddress] = useState<string>("");
@@ -11,11 +12,30 @@ const CreateGame = () => {
     const [move, setMove] = useState<Move>(Move.Null);
     const [contractAddress, setContractAddress] = useState<string>("")
     const { createGame } = useContract();
+    const { toast } = useToast()
 
     const startGame = async () => {
         const convertedSalt = parseInt(salt)
-        const address = await createGame(opponentAddress, move, convertedSalt, stake)
-        setContractAddress(address)
+
+        try {
+            const address = await createGame(opponentAddress, move, convertedSalt, stake)
+            setContractAddress(address)
+        } catch (error) {
+            console.log(error)
+            if (error === "Hasher Contract Not found") {
+                toast({
+                    description: "Check connection to network"
+                })
+            } else {
+                toast({
+                    title: "Creation Error",
+                    description: "Could not create contract",
+                    variant: "destructive"
+                })
+            }
+
+        }
+
     }
 
     return (
