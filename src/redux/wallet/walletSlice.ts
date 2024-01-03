@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Signer, providers } from "ethers";
 import { RootState } from "@/redux/store";
 
@@ -31,7 +31,6 @@ export const getNewProvider = createAsyncThunk("provider/getNewProvider", async 
     }
 
     const provider = new providers.Web3Provider(window.ethereum);
-
     const chainID = await provider.getNetwork();
 
     try {
@@ -49,7 +48,9 @@ export const getNewProvider = createAsyncThunk("provider/getNewProvider", async 
     return provider;
 })
 
-export const getNewSigner = createAsyncThunk("signer/getNewSigner", async (_, { rejectWithValue, getState }) => {
+export const accountsChanged = createAction<void>("wallet/accountsChanged");
+
+export const getNewSigner = createAsyncThunk("signer/getNewSigner", async (_, { rejectWithValue, getState, dispatch }) => {
 
     // Provider
     const state = getState() as RootState
@@ -61,6 +62,11 @@ export const getNewSigner = createAsyncThunk("signer/getNewSigner", async (_, { 
 
     try {
         await provider.send("eth_requestAccounts", [])
+
+        window.ethereum.on("accountsChanged", () => {
+            dispatch(accountsChanged())
+        })
+
         const signer = provider.getSigner();
         const address = await signer.getAddress();
         return {
@@ -85,13 +91,15 @@ const walletSlice = createSlice({
     },
     extraReducers: builder => {
         builder.addCase(getNewProvider.fulfilled, (state, action) => {
-            state.provider = action.payload
-            state.error = undefined
+            state.provider = action.payload;
+            state.error = undefined;
+            state.isProviderPresent = true;
         });
         builder.addCase(getNewProvider.rejected, (state, action) => {
             state.provider = {} as providers.Web3Provider;
             state.signer = {} as Signer;
             state.error = action.error.message;
+            state.isProviderPresent = false;
         });
         builder.addCase(getNewSigner.fulfilled, (state, action) => {
             state.signer = action.payload.signer;
@@ -101,6 +109,10 @@ const walletSlice = createSlice({
         builder.addCase(getNewSigner.rejected, (state, action) => {
             state.error = action.error.message
         });
+        builder.addCase(accountsChanged, (state) => {
+            state.signer = {} as Signer;
+            state.address = ""
+        })
     }
 })
 
