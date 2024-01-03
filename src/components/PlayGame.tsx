@@ -34,6 +34,7 @@ const PlayGame = () => {
     const { play, getContractInfo, solve, isValidAddress, c1Timeout, c2Timeout } = useContract();
     const address = useSelector((state: RootState) => state.wallet.address);
 
+    // Player 2's move should be submitted to the contract
     const playMove = async () => {
         if (move === Move.Null) {
             toast({
@@ -56,9 +57,9 @@ const PlayGame = () => {
         setMove(Move.Null);
         setSalt("");
         setTxLoading(false)
-
     }
 
+    // Player 1 should reveal his move and finalise the result
     const finalResult = async () => {
         if (move === Move.Null) {
             toast({
@@ -93,6 +94,7 @@ const PlayGame = () => {
         setTxLoading(false)
     }
 
+    // Get stake back incase of timeout occurs
     const getStakeBack = async () => {
         setTimeoutLoading(true);
         try {
@@ -113,6 +115,7 @@ const PlayGame = () => {
         setTimeoutLoading(false);
     }
 
+    // Get Initial contract Info
     async function getInfo() {
         setShowContract(false);
         if (!isValidAddress(contractAddress)) {

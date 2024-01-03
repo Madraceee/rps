@@ -7,8 +7,6 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Button } from "./ui/button"
 import { Download, Wallet2 } from "lucide-react"
-import Link from "next/link"
-
 const Login = () => {
 
     const router = useRouter()

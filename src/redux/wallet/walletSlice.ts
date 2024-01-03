@@ -48,6 +48,7 @@ export const getNewProvider = createAsyncThunk("provider/getNewProvider", async 
     return provider;
 })
 
+// Event Listner, If accounts changes, logout
 export const accountsChanged = createAction<void>("wallet/accountsChanged");
 
 export const getNewSigner = createAsyncThunk("signer/getNewSigner", async (_, { rejectWithValue, getState, dispatch }) => {

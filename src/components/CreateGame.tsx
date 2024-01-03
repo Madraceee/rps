@@ -23,6 +23,7 @@ const CreateGame = () => {
     const { createGame, isValidAddress } = useContract();
     const { toast } = useToast();
 
+    // Check for input types then create a new RPS contract
     const startGame = async () => {
         if (isNaN(parseInt(salt))) {
             toast({

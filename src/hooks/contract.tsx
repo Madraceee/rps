@@ -35,16 +35,17 @@ const ContractProvider = ({ children }: any) => {
 
     const HasherAddress = "0xd6c52Ea4a725Ef3574E60F8a935b6e6bEe4Ce8CF";
 
+    // Call Hash function from another contract
     const hash = async (move: Move, salt: BigNumber) => {
         if (HasherAddress !== undefined) {
             const contractFactory = HasherAbi__factory.connect(HasherAddress, provider)
             const hash = await contractFactory.hash(BigNumber.from(move), salt);
             return hash
         }
-
         throw new Error("Hasher Contract Not found");
     }
 
+    // Create a new contract and deploy it
     const createGame = useCallback(async (playerTow: string, move: Move, salt: number, stake: string, valueType: string) => {
         try {
             const contractFactory = new ContractFactory(RPSABI, RPSBytecode, signer);
@@ -72,8 +73,6 @@ const ContractProvider = ({ children }: any) => {
         } catch (error) {
             throw new Error("Could not execute Transaction")
         }
-
-
     }, [signer]);
 
     const solve = useCallback(async (contractAddress: string, move: Move, salt: BigNumber) => {
@@ -86,7 +85,6 @@ const ContractProvider = ({ children }: any) => {
             console.log(error)
             throw new Error("Could not execute Transaction");
         }
-
     }, [signer]);
 
     const c1Timeout = useCallback(async (contractAddress: string) => {
@@ -99,7 +97,6 @@ const ContractProvider = ({ children }: any) => {
             console.log(error)
             throw new Error("Could not Execute Timeout");
         }
-
     }, [signer]);
 
     const c2Timeout = useCallback(async (contractAddress: string) => {
@@ -112,6 +109,7 @@ const ContractProvider = ({ children }: any) => {
         }
     }, [signer]);
 
+    // Get Details for the contract given address
     const getContractInfo = useCallback(async (contractAddress: string) => {
         const contract = RpsAbi__factory.connect(contractAddress, provider);
         const stake = await contract.stake();
