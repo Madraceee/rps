@@ -80,8 +80,10 @@ const ContractProvider = ({ children }: any) => {
         try {
             const contract = RpsAbi__factory.connect(contractAddress, signer);
             const tx = await contract.solve(BigNumber.from(move), salt);
+            await tx.wait();
             return tx.hash;
         } catch (error) {
+            console.log(error)
             throw new Error("Could not execute Transaction");
         }
 
@@ -91,6 +93,7 @@ const ContractProvider = ({ children }: any) => {
         try {
             const contract = RpsAbi__factory.connect(contractAddress, signer);
             const tx = await contract.j1Timeout();
+            await tx.wait();
             return tx.hash;
         } catch (error) {
             console.log(error)

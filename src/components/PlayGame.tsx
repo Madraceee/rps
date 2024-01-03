@@ -13,6 +13,7 @@ import { toast } from "./ui/use-toast";
 import { Loader2 } from "lucide-react";
 import CopyToClipBoard from "./CopyToClipboard";
 import { shortenTxHash } from "@/lib/utils";
+import Link from "next/link";
 
 const PlayGame = () => {
 
@@ -96,10 +97,13 @@ const PlayGame = () => {
         setTimeoutLoading(true);
         try {
             if (address === j1) {
-                await c1Timeout(contractAddress);
-            } else if (address === j2) {
                 await c2Timeout(contractAddress);
+            } else if (address === j2) {
+                await c1Timeout(contractAddress);
             }
+            toast({
+                description: "Timeout Transaction Success"
+            })
         } catch (error) {
             toast({
                 description: "Timeout execution failed",
@@ -134,6 +138,11 @@ const PlayGame = () => {
 
     return (
         <div className="flex flex-col gap-2 items-start w-full">
+            <div className="text-muted-foreground">
+                <p className="text-2xl font-bold text-primary">Play game</p>
+                <p>Play the game with the contract address created by Player 1</p>
+                <p>Rules are : <Link href={"https://bigbangtheory.fandom.com/wiki/Rock,_Paper,_Scissors,_Lizard,_Spock"} className="text-white underline">Link</Link></p>
+            </div>
             <div className="flex flex-row gap-2 w-full">
                 <Input value={contractAddress} onChange={(e) => setContractAddress(e.target.value)} placeholder="Enter Contract Address" />
                 <Button onClick={getInfo}>Open Game</Button>
@@ -171,17 +180,6 @@ const PlayGame = () => {
                                         <MoveBtn text="Spock" onClick={() => setMove(Move.Spock)} isSelected={move === 4} />
                                         <MoveBtn text="Lizard" onClick={() => setMove(Move.Lizard)} isSelected={move === 5} />
                                     </div>
-                                    {isTimeout ?
-                                        <Button onClick={getStakeBack} className="w-fit mx-auto" disabled={timeoutLoading}>
-                                            {timeoutLoading ?
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    Loading
-                                                </> :
-                                                <>Get Stake Back</>
-                                            }
-                                        </Button>
-                                        : null}
                                     {
                                         address === j2 &&
                                         <>
@@ -211,6 +209,18 @@ const PlayGame = () => {
 
                                             </Button>
                                         </>
+                                    }
+                                    {isTimeout ?
+                                        <Button onClick={getStakeBack} className="w-fit mx-auto" disabled={timeoutLoading}>
+                                            {timeoutLoading ?
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Loading
+                                                </> :
+                                                <>Get Stake Back</>
+                                            }
+                                        </Button>
+                                        : null
                                     }
                                     {tx !== "" ?
                                         <p className="text-center w-full">

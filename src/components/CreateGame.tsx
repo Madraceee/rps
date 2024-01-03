@@ -9,6 +9,8 @@ import { Input } from "./ui/input";
 import { Loader2 } from "lucide-react";
 import CopyToClipBoard from "./CopyToClipboard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { shortenAddress } from "@/lib/utils";
+import Link from "next/link";
 
 const CreateGame = () => {
     const [opponentAddress, setOpponentAddress] = useState<string>("");
@@ -60,15 +62,15 @@ const CreateGame = () => {
             setSalt("")
             setMove(Move.Null)
             setStake("")
-        } catch (error) {
-            if (error === "Hasher Contract Not found") {
+        } catch (error: any) {
+            if (error.message === "Hasher Contract Not found") {
                 toast({
                     description: "Check connection to network"
                 })
             } else {
                 toast({
                     title: "Creation Error",
-                    description: "Could not create contract",
+                    description: error.message,
                     variant: "destructive"
                 })
             }
@@ -95,6 +97,7 @@ const CreateGame = () => {
             <div className="text-muted-foreground">
                 <p className="text-2xl font-bold text-primary">Create a game</p>
                 <p>Enter your opponent address, move, and salt</p>
+                <p>Rules are : <Link href={"https://bigbangtheory.fandom.com/wiki/Rock,_Paper,_Scissors,_Lizard,_Spock"} className="text-white underline">Link</Link></p>
                 <p><span className="font-bold ">Note:</span> Remember your salt and move</p>
             </div>
             <Input value={opponentAddress} onChange={(e) => setOpponentAddress(e.target.value)} placeholder="Opp. Address" />
@@ -135,8 +138,8 @@ const CreateGame = () => {
 
             </Button>
             {contractAddress !== "" ?
-                <p className="text-center">
-                    Contract Address : <span className="font-bold">{contractAddress} <CopyToClipBoard content={contractAddress} /></span>
+                <p className="text-center w-full">
+                    Contract Address : <span className="font-bold">{shortenAddress(contractAddress)} <CopyToClipBoard content={contractAddress} /></span>
                 </p> : null}
         </div>
     );
