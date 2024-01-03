@@ -171,7 +171,7 @@ const PlayGame = () => {
                                 <>
                                     {
                                         address === j2 ?
-                                            <p className="text-left">This is player 2's turn</p>
+                                            <p className="text-left">This is player 2s turn</p>
                                             :
                                             <p>Player 1, confirm your move</p>
                                     }
