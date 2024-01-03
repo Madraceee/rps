@@ -4,6 +4,8 @@ Contract runs on **Mumbai Polygon Testnet**
 
 Hasher Contract Address : 0xd6c52Ea4a725Ef3574E60F8a935b6e6bEe4Ce8CF
 
+Link: https://rps-five-plum.vercel.app/play
+
 ---
 
 ## Getting Started
