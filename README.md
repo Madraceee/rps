@@ -1,8 +1,8 @@
 This is the frontend for RPS contract
 
-Contract runs on **Mumbai Polygon Testnet**
+Contract runs on **Sepolia Ethereum Testnet**
 
-Hasher Contract Address : 0xd6c52Ea4a725Ef3574E60F8a935b6e6bEe4Ce8CF
+Hasher Contract Address : 0x9930eAE9CCF9f579c80d2D83e7CaE1B618e87d3E
 
 Link: https://rps-five-plum.vercel.app/play
 
