@@ -34,13 +34,14 @@ export const getNewProvider = createAsyncThunk("provider/getNewProvider", async 
     const chainID = await provider.getNetwork();
 
     try {
-        if (chainID.chainId !== 80001) {
+        if (chainID.chainId !== 11155111) {
             await window.ethereum.request({
                 method: "wallet_switchEthereumChain",
-                params: [{ chainId: "0x13881" }]
+                params: [{ chainId: "0xaa36a7" }]
             })
         }
     } catch (error) {
+        console.log(error)
         return rejectWithValue("Could not switch network")
     }
 

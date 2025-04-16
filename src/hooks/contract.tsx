@@ -33,7 +33,7 @@ const ContractProvider = ({ children }: any) => {
     const signer = useSelector((state: RootState) => state.wallet.signer);
     const provider = useSelector((state: RootState) => state.wallet.provider);
 
-    const HasherAddress = "0xd6c52Ea4a725Ef3574E60F8a935b6e6bEe4Ce8CF";
+    const HasherAddress = "0x9930eAE9CCF9f579c80d2D83e7CaE1B618e87d3E";
 
     // Call Hash function from another contract
     const hash = async (move: Move, salt: BigNumber) => {
